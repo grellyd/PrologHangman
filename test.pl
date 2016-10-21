@@ -1,6 +1,6 @@
-pl_number(Num) --> { integer(Num) }.
-pl_number([H]) --> [H], pl_number(H).
-pl_number(Num) --> { float(Num) }.
+% pl_number(Num) --> { integer(Num) }.
+% pl_number([H]) --> [H], pl_number(H).
+% pl_number(Num) --> { float(Num) }.
 
 
 %% this rule doesnt compile
@@ -15,3 +15,6 @@ pl_number(Num) --> { float(Num) }.
 % Testing...
 % phrase(pl_number(Num), [5]).
 % phrase(pl_number([H]), [5]).
+
+pl_number([H|T]) --> [H], {integer(H)}, pl_number(T).
+pl_number([]) --> [].
