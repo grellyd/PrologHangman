@@ -1,13 +1,15 @@
 % Hangman - CS 312 Project 1
 % Graham Brown, Tyler Young, Yasmeen Akbari
 
-:- dynamic lives_remaining/1, won/1, word_char_list/1, player_prog_list/1, player_guess_list/1.
+:- dynamic lives_remaining/1, won/1, word_char_list/1, player_prog_list/1, player_guess_list/1, cur_guess/1.
 
+char_white_list(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']).
 word_char_list([]).
 player_prog_list([]).
 player_guess_list([]).
 lives_remaining(6).
 won(0).
+cur_guess('').
 
 start_hangman :-
 	write('\e[H\e[2J'),
@@ -22,6 +24,7 @@ start_hangman :-
     play_game.
     
 play_game :-
+	\+win_condition,
     lives_remaining(L),
     L>0,
 	write('Lives remaining: '),
@@ -29,10 +32,13 @@ play_game :-
 	nl,
     write('Player 2, please enter your guess (single char, end with .):'),
     read(Guess),
-    update_progress(Guess),
+    retract(cur_guess(_)),
+    assert(cur_guess(Guess)),
+    guess_check,
+    cur_guess(CheckedGuess),
+    update_progress(CheckedGuess),
 	player_prog_list(P),
 	player_guess_list(GL),
-	\+ win_condition,
 	nl,
 	write('Your progress: '),
 	write($P),
@@ -42,7 +48,7 @@ play_game :-
 	nl,
     
     play_game.
-	
+
 play_game :-
 	win_condition,
 	player_prog_list(P),
@@ -58,6 +64,38 @@ play_game :-
 	nl,
 	reset_start_values.
 
+guess_check :-
+    cur_guess(Guess),
+    atom_chars(Guess, GuessChars),
+    length(GuessChars, Len),
+    Len=1,
+    char_white_list(AllowedChars),
+    member(Guess, AllowedChars).
+
+guess_check :-
+    cur_guess(Guess),
+    atom_chars(Guess, GuessChars),
+    length(GuessChars, Len),
+    Len=1,
+    char_white_list(AllowedChars),
+    \+member(Guess, AllowedChars),
+    write('Guess is an unallowed character. Please enter a lowercase character from a to z:'),
+    read(NewGuess),
+    retract(cur_guess(_)),
+    assert(cur_guess(NewGuess)),
+    guess_check.
+
+guess_check :-
+    cur_guess(Guess),
+    atom_chars(Guess, GuessChars),
+    length(GuessChars, Len),
+    Len>1,
+    write('Guess is too long. Please enter a single character:'),
+    read(NewGuess),
+    retract(cur_guess(_)),
+    assert(cur_guess(NewGuess)),
+    guess_check.
+
 reset_start_values :-
     retract(word_char_list(_)),
     retract(player_prog_list(_)),
@@ -68,7 +106,8 @@ reset_start_values :-
 	assert(player_prog_list([])),
 	assert(player_guess_list([])),
 	assert(lives_remaining(6)),
-	assert(won(0)).
+	assert(won(0)),
+    assert(guess('')).
 
 win_condition :-	
     word_char_list(WCL),
