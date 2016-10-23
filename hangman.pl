@@ -1,9 +1,11 @@
 % Hangman - CS 312 Project 1
 % Graham Brown, Tyler Young, Yasmeen Akbari
 
+%%%%%%%% TODO: start_hangman(WordCharList, PlayerProgList) can just be start_hangman, but putting the vars there
+%%%%%%%%		allows us to see the results for now
+start_hangman(WordCharList, PlayerProgList) :- init_word(WordCharList), init_player_view(WordCharList, PlayerProgList), play_game(WordCharList, PlayerProgList).
 
-start_hangman(WordCharList) :- init_word(WordCharList),play_game(WordCharList).
-play_game(WordCharList). % Probably turn this line into our "loop"
+play_game(WordCharList, PlayerProgList). % Probably turn this line into our "loop"
 
 
 % Prompts user to enter a word, and creates a list with the chars of the word
@@ -14,6 +16,12 @@ init_word(WordCharList) :- write('Please enter a word for player 2 to guess (can
 % Check the that the WordCharList is composed of only alpha chars
 is_alpha_list([H|T]) :- char_type(H, alpha), is_alpha_list(T).
 is_alpha_list([]).
+
+% Create the list that displays player 2 progress
+init_player_view(WordCharList, PlayerProgList) :- length(WordCharList, L), create_player_list(L, [], PlayerProgList). % maybe make copy and change it?
+
+create_player_list(0, PlayerProgList, PlayerProgList).
+create_player_list(L, R, PlayerProgList) :- L > 0, L1 is L-1, create_player_list(L1, ['_'|R], PlayerProgList).
 
 
 
