@@ -4,11 +4,24 @@
 %%%%%%%% TODO: start_hangman(WordCharList, PlayerProgList, Lives) can just be start_hangman, but putting the vars there
 %%%%%%%%		allows us to test the init values 
 
-get_lives(N) :- N is 6. % The number of wrong guesses Player 2 has
+:- dynamic lives_remaining/1, won/1.
+
+lives_remaining(6).
+won(0).
+
 start_hangman(WordCharList, PlayerProgList, Lives) :- init_word(WordCharList), init_player_view(WordCharList, PlayerProgList),
 												get_lives(Lives), play_game(Lives, WordCharList, PlayerProgList).
 
-play_game(Lives, WordCharList, PlayerProgList). % Probably turn this line into our "loop"
+% game loop
+play_game(Lives, WordCharList, PlayerProgList) :-
+    lives_remaining(L),
+    retract(lives_remaining(L)),
+    assert(lives_remaining(L-1)),
+    
+    write('Lives Remaining:'),
+    write(lives_remaining(N)),
+    play_game(Lives, WordCharList, PlayerProgList).
+
 
 
 % Prompts user to enter a word, and creates a list with the chars of the word
