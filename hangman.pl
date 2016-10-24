@@ -1,10 +1,11 @@
 % Hangman - CS 312 Project 1
 % Graham Brown, Tyler Young, Yasmeen Akbari
 
-:- dynamic lives_remaining/1, won/1, word_char_list/1, player_prog_list/1.
+:- dynamic lives_remaining/1, won/1, word_char_list/1, player_prog_list/1, player_guess_list/1.
 
 word_char_list([]).
 player_prog_list([]).
+player_guess_list([]).
 lives_remaining(6).
 won(0).
 
@@ -27,10 +28,14 @@ play_game :-
     read(Guess),
     update_progress(Guess),
 	player_prog_list(P),
+	player_guess_list(GL),
 	\+ win_condition,
 	nl,
 	write('Your progress: '),
 	write($P),
+	nl,
+	write('Your guesses: '),
+	write($GL),
 	nl,
     
     play_game.
@@ -51,14 +56,18 @@ play_game :-
 	assert(won(0)).	
 
 play_game :-
-    write('You lost!'),
+	word_char_list(WCL),
+    write('You lost! The word was '),
+	write($WCL),
 	nl,
     retract(word_char_list(_)),
     retract(player_prog_list(_)),
     retract(lives_remaining(_)),
     retract(won(_)),
+	retract(player_guess_list(_)),
 	assert(word_char_list([])),
 	assert(player_prog_list([])),
+	assert(player_guess_list([])),
 	assert(lives_remaining(6)),
 	assert(won(0)).
 
@@ -77,7 +86,8 @@ update_progress(Guess) :-
     word_char_list(WCL),
 	player_prog_list(PPL),
     member(Guess, WCL),
-	change_progress_list(Guess, WCL, PPL, []).
+	change_progress_list(Guess, WCL, PPL, []),
+	change_guess_list(Guess).
 
 update_progress(Guess) :-
     word_char_list(WCL),
@@ -85,7 +95,14 @@ update_progress(Guess) :-
     lives_remaining(L),
     NL is L-1,
     retract(lives_remaining(L)),
-    assert(lives_remaining(NL)).
+    assert(lives_remaining(NL)),
+	change_guess_list(Guess).
+
+change_guess_list(Guess) :-
+	player_guess_list(GL),
+	append([Guess], GL, GL1),
+	retract(player_guess_list(_)),
+	assert(player_guess_list(GL1)).
 	
 change_progress_list(Guess, [H_WCL|T_WCL], [_|T_PPL], NewPPL) :-
 	Guess == H_WCL, 
@@ -105,6 +122,7 @@ change_progress_list(_, [], [], NewPPL):-
 % Prompts user to enter a word, and creates a list with the chars of the word
 init_word(WordCharList) :- 
     write('Player1, please enter a word for player 2 to guess (can\'t start uppercase, end with .): '),
+	nl,
     read(Word),
     atom_chars(Word, WordCharList), 
     is_alpha_list(WordCharList).
