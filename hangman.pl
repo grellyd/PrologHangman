@@ -12,12 +12,14 @@ lives_remaining(6).
 won(0).
 
 start_hangman :-
+	write('\e[H\e[2J'),
     init_word(WCL),
     retract(word_char_list(_)),
     assert(word_char_list(WCL)),
     init_player_view(PPL),
     retract(player_prog_list(_)),
     assert(player_prog_list(PPL)),
+	write('\e[H\e[2J'),
    
     play_game.
     
