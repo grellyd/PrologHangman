@@ -36,7 +36,11 @@ play_game :-
     retract(word_char_list(_)),
     retract(player_prog_list(_)),
     retract(lives_remaining(_)),
-    retract(won(_)).
+    retract(won(_)),
+	assert(word_char_list([])),
+	assert(player_prog_list([])),
+	assert(lives_remaining(6)),
+	assert(won(0)).
 
 update_progress(Guess) :-
     word_char_list(WCL),
