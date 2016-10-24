@@ -27,7 +27,12 @@ play_game :-
     L>0,
     write('Player 2, please enter your guess (single char, end with .):'),
     read(Guess),
-    update_progress(Guess), 
+    update_progress(Guess),
+	player_prog_list(P),
+	nl,
+	write('Your progress: '),
+	write($P),
+	nl,
     
     play_game.
 
@@ -44,7 +49,9 @@ play_game :-
 
 update_progress(Guess) :-
     word_char_list(WCL),
-    member(Guess, WCL).
+	player_prog_list(PPL),
+    member(Guess, WCL),
+	change_progress_list(Guess, WCL, PPL, []).
 
 update_progress(Guess) :-
     word_char_list(WCL),
@@ -53,7 +60,22 @@ update_progress(Guess) :-
     NL is L-1,
     retract(lives_remaining(L)),
     assert(lives_remaining(NL)).
+	
+change_progress_list(Guess, [H_WCL|T_WCL], [_|T_PPL], NewPPL) :-
+	Guess == H_WCL, 
+	append(NewPPL, [Guess], NewPPL1), 
+	change_progress_list(Guess, T_WCL, T_PPL, NewPPL1).
+	
 
+change_progress_list(Guess, [H_WCL|T_WCL], [H_PPL|T_PPL], NewPPL) :-
+	Guess \== H_WCL,
+	append(NewPPL, [H_PPL], NewPPL1),
+	change_progress_list(Guess, T_WCL, T_PPL, NewPPL1).
+
+change_progress_list(_, [], [], NewPPL):-
+	retract(player_prog_list(_)),
+	assert(player_prog_list(NewPPL)).
+	
 % Prompts user to enter a word, and creates a list with the chars of the word
 %%%%%%%% TODO: is there a way to clear the console so player 2 can't see the input?
 init_word(WordCharList) :- 
