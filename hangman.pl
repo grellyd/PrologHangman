@@ -15,7 +15,6 @@ start_hangman :-
     init_word(WCL),
     retract(word_char_list(_)),
     assert(word_char_list(WCL)),
-    
     init_player_view(PPL),
     retract(player_prog_list(_)),
     assert(player_prog_list(PPL)),
@@ -29,15 +28,32 @@ play_game :-
     read(Guess),
     update_progress(Guess),
 	player_prog_list(P),
+	\+ win_condition,
 	nl,
 	write('Your progress: '),
 	write($P),
 	nl,
     
     play_game.
+	
+play_game :-
+	win_condition,
+	player_prog_list(P),
+	write($P),
+	nl,
+	write('You won!'),
+    retract(word_char_list(_)),
+    retract(player_prog_list(_)),
+    retract(lives_remaining(_)),
+    retract(won(_)),
+	assert(word_char_list([])),
+	assert(player_prog_list([])),
+	assert(lives_remaining(6)),
+	assert(won(0)).	
 
 play_game :-
     write('You lost!'),
+	nl,
     retract(word_char_list(_)),
     retract(player_prog_list(_)),
     retract(lives_remaining(_)),
@@ -47,6 +63,17 @@ play_game :-
 	assert(lives_remaining(6)),
 	assert(won(0)).
 
+win_condition :-	
+    word_char_list(WCL),
+	player_prog_list(PPL),
+	length(WCL, WCL_L),
+	length(PPL, PPL_L),
+	WCL_L == PPL_L,
+	intersection(WCL, PPL, L),
+	length(L, L_L),
+	WCL_L == L_L.
+	
+	
 update_progress(Guess) :-
     word_char_list(WCL),
 	player_prog_list(PPL),
