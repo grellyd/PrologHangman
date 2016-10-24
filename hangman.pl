@@ -49,20 +49,16 @@ play_game :-
 	write($P),
 	nl,
 	write('You won!'),
-    retract(word_char_list(_)),
-    retract(player_prog_list(_)),
-    retract(lives_remaining(_)),
-    retract(won(_)),
-	assert(word_char_list([])),
-	assert(player_prog_list([])),
-	assert(lives_remaining(6)),
-	assert(won(0)).	
+	reset_start_values.
 
 play_game :-
 	word_char_list(WCL),
     write('You lost! The word was '),
 	write($WCL),
 	nl,
+	reset_start_values.
+
+reset_start_values :-
     retract(word_char_list(_)),
     retract(player_prog_list(_)),
     retract(lives_remaining(_)),
@@ -88,18 +84,42 @@ win_condition :-
 update_progress(Guess) :-
     word_char_list(WCL),
 	player_prog_list(PPL),
+	player_guess_list(PGL),
     member(Guess, WCL),
+	\+member(Guess, PGL),
 	change_progress_list(Guess, WCL, PPL, []),
 	change_guess_list(Guess).
 
 update_progress(Guess) :-
     word_char_list(WCL),
+	player_guess_list(PGL),
+    member(Guess, WCL),
+	member(Guess, PGL),
+	nl,
+	write('You already guessed: '),
+	write($Guess),
+	nl.
+
+update_progress(Guess) :-
+    word_char_list(WCL),
+	player_guess_list(PGL),
     \+member(Guess, WCL),
+	\+member(Guess, PGL),
     lives_remaining(L),
     NL is L-1,
     retract(lives_remaining(L)),
     assert(lives_remaining(NL)),
 	change_guess_list(Guess).
+	
+update_progress(Guess) :-
+    word_char_list(WCL),
+	player_guess_list(PGL),
+    \+member(Guess, WCL),
+	member(Guess, PGL),
+	nl,
+    write('You already guessed: '),
+	write($Guess),
+	nl.
 
 change_guess_list(Guess) :-
 	player_guess_list(GL),
