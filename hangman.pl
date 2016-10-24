@@ -1,9 +1,6 @@
 % Hangman - CS 312 Project 1
 % Graham Brown, Tyler Young, Yasmeen Akbari
 
-%%%%%%%% TODO: start_hangman(WordCharList, PlayerProgList, Lives) can just be start_hangman, but putting the vars there
-%%%%%%%%		allows us to test the init values 
-
 :- dynamic lives_remaining/1, won/1, word_char_list/1, player_prog_list/1.
 
 word_char_list([]).
@@ -106,7 +103,6 @@ change_progress_list(_, [], [], NewPPL):-
 	assert(player_prog_list(NewPPL)).
 	
 % Prompts user to enter a word, and creates a list with the chars of the word
-%%%%%%%% TODO: is there a way to clear the console so player 2 can't see the input?
 init_word(WordCharList) :- 
     write('Player1, please enter a word for player 2 to guess (can\'t start uppercase, end with .): '),
     read(Word),
