@@ -97,8 +97,9 @@ update_progress(Guess) :-
 	member(Guess, PGL),
 	nl,
 	write('You already guessed: '),
-	write($Guess),
-	nl.
+	write(Guess),
+	nl,
+	!.
 
 update_progress(Guess) :-
     word_char_list(WCL),
@@ -118,8 +119,9 @@ update_progress(Guess) :-
 	member(Guess, PGL),
 	nl,
     write('You already guessed: '),
-	write($Guess),
-	nl.
+	write(Guess),
+	nl,
+	!.
 
 change_guess_list(Guess) :-
 	player_guess_list(GL),
