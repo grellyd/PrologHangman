@@ -1,6 +1,7 @@
 % Hangman - CS 312 Project 1
 % Graham Brown, Tyler Young, Yasmeen Akbari
 
+:- use_module(easyList), use_module(mediumList), use_module(hardList).
 :- dynamic lives_remaining/1, won/1, word_char_list/1, player_prog_list/1, player_guess_list/1.
 
 word_char_list([]).
@@ -8,9 +9,28 @@ player_prog_list([]).
 player_guess_list([]).
 lives_remaining(6).
 won(0).
-
-start_hangman :-
+    
+play_hangman :-
 	write('\e[H\e[2J'),
+	write('Welcome to Hangman! How many players are playing today? Please type in "1" or "2".'),
+	nl,
+	read(Word),
+	player_mode(Word).
+
+player_mode(1) :-
+	write('Please select a difficulty level. Available difficulties are easy, medium, and hard.'),
+	read(Difficulty),
+	setDifficulty(Difficulty, List),
+	random_member(Word, List),
+	init_word(Word, WCL),
+    retract(word_char_list(_)),
+    assert(word_char_list(WCL)),
+    init_player_view(PPL),
+    retract(player_prog_list(_)),
+    assert(player_prog_list(PPL)),
+    play_game.
+	
+player_mode(2) :-
     init_word(WCL),
     retract(word_char_list(_)),
     assert(word_char_list(WCL)),
@@ -20,14 +40,23 @@ start_hangman :-
 	write('\e[H\e[2J'),
    
     play_game.
-    
+
+setDifficulty(easy, List) :-
+	easyList(List).
+
+setDifficulty(medium, List) :-
+	mediumList(List).
+
+setDifficulty(hard, List) :-
+	hardList(List).
+
 play_game :-
     lives_remaining(L),
     L>0,
 	write('Lives remaining: '),
 	write(L),
 	nl,
-    write('Player 2, please enter your guess (single char, end with .):'),
+    write('Please enter your guess (single char, end with .):'),
     read(Guess),
     update_progress(Guess),
 	player_prog_list(P),
@@ -143,7 +172,7 @@ change_progress_list(Guess, [H_WCL|T_WCL], [H_PPL|T_PPL], NewPPL) :-
 change_progress_list(_, [], [], NewPPL):-
 	retract(player_prog_list(_)),
 	assert(player_prog_list(NewPPL)).
-	
+		
 % Prompts user to enter a word, and creates a list with the chars of the word
 init_word(WordCharList) :- 
     write('Player1, please enter a word for player 2 to guess (can\'t start uppercase, end with .): '),
@@ -151,6 +180,10 @@ init_word(WordCharList) :-
     read(Word),
     atom_chars(Word, WordCharList), 
     is_alpha_list(WordCharList).
+	
+init_word(P1, WordCharList) :-
+	atom_chars(P1, WordCharList),
+	is_alpha_list(WordCharList).
 					
 % Check the that the WordCharList is composed of only alpha chars
 is_alpha_list([H|T]) :- char_type(H, alpha), is_alpha_list(T).
