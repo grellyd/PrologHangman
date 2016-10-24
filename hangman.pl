@@ -24,6 +24,9 @@ start_hangman :-
 play_game :-
     lives_remaining(L),
     L>0,
+	write('Lives remaining: '),
+	write(L),
+	nl,
     write('Player 2, please enter your guess (single char, end with .):'),
     read(Guess),
     update_progress(Guess),
