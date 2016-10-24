@@ -217,7 +217,8 @@ init_word(WordCharList) :-
     write('Player1, please enter a word for player 2 to guess (can\'t start uppercase, end with .): '),
 	nl,
     read(Word),
-    atom_chars(Word, WordCharList), 
+	downcase_atom(Word, Word1),
+    atom_chars(Word1, WordCharList), 
     is_alpha_list(WordCharList).
 	
 init_word(P1, WordCharList) :-
